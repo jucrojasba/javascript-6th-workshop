@@ -1,5 +1,16 @@
 // Ruta del archivo data.json
-const url = "data.json"; // Cambiar por la ruta correcta
+const url = "data.json";
+
+//Función para validar que el valor ingresado por el ususario sea de 3 digitos y sea un valor numerico.
+function validateNumber(value){
+  const validateNumber = /^\d{3}$/;
+  if (validateNumber.test(value)) {
+    return true;
+  } else {
+    alert(`Opción inválida, porfavor ingresa el numero de la habitación que deseas reservar`);
+    return false;
+  }
+}
 
 // Función para cargar y mostrar el contenido de data.json
 function cargarYMostrarData() {
@@ -27,21 +38,44 @@ function cargarYMostrarData() {
   });
 }
 
+// Función para registrar reservas
+function crearReserva(numeroHabitacion, fechaInicio, fechaFin, huesped) {
+  function generarGeneradorId() {
+    let id = 1; // Variable id se inicializa fuera de la función interna
+
+    return function () {
+      return id++; // Cada vez que se llama a la función, se incrementa id y se devuelve
+    };
+  }
+
+  const generarId = generarGeneradorId(); // Se obtiene la función interna generarId()
+
+  // Pruebas
+  console.log(generarId()); // 1
+  console.log(generarId()); // 2
+  console.log(generarId()); // 3
+  console.log(generarId()); // 4
+  console.log(generarId()); // 5
+}
+
 // Llamar a la función para cargar y mostrar el contenido de data.json
 cargarYMostrarData()
   .then(({ rooms, roomTypes }) => {
     // Mostrar el contenido de las habitaciones después de cargar los datos
-    const userInput = prompt(
-      "Ingrese el numero de habitacion a reservar: " +
-        rooms
-          .map((room) => {
-            return `\nRoom Number: ${room.number} (${
-              roomTypes.find((type) => type.id === room.type).name
-            })`;
-          })
-          .join(", ")
-    );
-    // ... Continuar con la lógica de la app
+    let userInput;
+    do {
+      userInput = prompt(
+        "Ingrese el numero de habitacion a reservar: " +
+          rooms
+            .map((room) => {
+              return `\nRoom Number: ${room.number} (${
+                roomTypes.find((type) => type.id === room.roomTypeId).name
+              })`;
+            })
+            .join(" ")
+      );
+    } while (!validateNumber(userInput.trim()));
+    return userInput;
   })
   .catch((error) => {
     console.error("Error al manejar la promesa:", error);
