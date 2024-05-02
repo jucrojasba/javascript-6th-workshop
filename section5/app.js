@@ -1,10 +1,10 @@
 // Ruta del archivo data.json
 const url = "data.json";
 // Reservaciones
-let bookings =[];
+let bookings = [];
 
 //Función para validar que el valor ingresado por el ususario sea un valor numerico.
-function validateNumber(value){
+function validateNumber(value) {
   const validateNumber = /^\d+$/;
   if (validateNumber.test(value)) {
     return true;
@@ -15,30 +15,34 @@ function validateNumber(value){
 }
 
 //Funcion para validar que el nombre ingresado por el usuario solo tenga su primer nombre y su primer apellido
-function validateGuestName(value){
+function validateGuestName(value) {
   const validateWord = /^[a-zñáéíóú]+ [a-zñáéíóú]+$/i;
   if (validateWord.test(value)) {
-    return  true;
+    return true;
   } else {
     alert(`Valor inválido, ingresa tu primer nombre y tu primer apellido`);
   }
 }
 
 //Funcion para validar que la fecha sea despues de hoy() y que este ingresada en formato DD/MM/AAAA
-function validateDate(value){
+function validateDate(value) {
   const validateDate = /^\d{2}\/\d{2}\/\d{4}$/;
   const hoy = new Date();
   if (validateDate.test(value)) {
-    const [dia, mes, año] = value.split('/');
+    const [dia, mes, año] = value.split("/");
     const fechaUsuario = new Date(`${año}-${mes}-${dia}`);
     if (fechaUsuario.getTime() > hoy.getTime()) {
       return true;
     } else {
-      alert(`La fecha no puede ser antes de hoy, porfavor ingresa una fecha correcta`);
+      alert(
+        `La fecha no puede ser antes de hoy, porfavor ingresa una fecha correcta`
+      );
       return false;
     }
   } else {
-    alert(`Formato inválido, ingresa porfavor una fecha con el siguiente formato: DD/MM/AAAA`)
+    alert(
+      `Formato inválido, ingresa porfavor una fecha con el siguiente formato: DD/MM/AAAA`
+    );
     return false;
   }
 }
@@ -65,77 +69,264 @@ function cargarYMostrarData() {
           console.error(error);
           reject(error); // Rechaza la promesa si hay un error
         });
-    }, 3000);
+    }, 1000);
   });
 }
 
 // Función para registrar reservas
-// function crearReserva(numeroHabitacion, fechaInicio, fechaFin, huesped) {
-  
-//   function generarGeneradorId() {
-//     let id = 1; // Variable id se inicializa fuera de la función interna
-
-//     return function () {
-//       return id++; // Cada vez que se llama a la función, se incrementa id y se devuelve
-//     };
-//   }
-
-//   const generarId = generarGeneradorId(); // Se obtiene la función interna generarId()
-
-// }
-
-// Llamar a la función para cargar y mostrar el contenido de data.json
-cargarYMostrarData()
-  .then(({ rooms, roomTypes }) => {
-    // Mostrar el contenido de las habitaciones después de cargar los datos
-    let numeroHabitacion, cantidadHuespedes, fechaInicio, fechaFin, huesped;
+function crearReserva(a, b) {
+  let numeroHabitacion,
+    cantidadHuespedes,
+    fechaInicio,
+    fechaFin,
+    huesped,
+    rooms = a,
+    roomTypes = b;
+  validateCantidadHuespedes();
+  validateHabitacion();
+  checkin();
+  checkout();
+  confirmationBooking();
+  function validateCantidadHuespedes() {
     do {
-      cantidadHuespedes = parseFloat(prompt(`Te damos la bienvenida! \n\nPara iniciar tu proceso de reserva cuentanos:\n\n¿cuantos huespedes se quedaran en la misma habitación? (máx 6) \n\nEscribe profavor un número:`));
-      
-    } while (!validateNumber(cantidadHuespedes) || cantidadHuespedes>6);
+      cantidadHuespedes = parseFloat(
+        prompt(
+          `Te damos la bienvenida! \n\nPara iniciar tu proceso de reserva cuentanos:\n\n¿cuantos huespedes se quedaran en la misma habitación? (máx 6) \n\nEscribe profavor un número:`
+        )
+      );
+    } while (!validateNumber(cantidadHuespedes) || cantidadHuespedes > 6);
+  }
+  function validateHabitacion() {
     let roomNumberAvailable = rooms.map((room) => {
-      if(room.availability && parseFloat(roomTypes.find((type) => type.id === room.roomTypeId).capacity) >= cantidadHuespedes){
-        return room.number
-      };
-      });
-    do {
-      numeroHabitacion = parseFloat(prompt(
-        "Las habitaciones disponibles para esa cantidad de personas son:" +
-          rooms
-            .map((room) => {
-              if(room.availability && parseFloat(roomTypes.find((type) => type.id === room.roomTypeId).capacity) >= cantidadHuespedes){
-                return `\nRoom Number: ${room.number} (${
-                  roomTypes.find((type) => type.id === room.roomTypeId).name
-                })`;
-              }
-            })
-            .join(" ")+"\n\nIngrese el numero de habitacion a reservar:" 
-      ));
-      if(!roomNumberAvailable.includes(numeroHabitacion)){
-        alert(`Esa habitación no se encuentra en la lista proporcionada, porfavor ingresa un numero de habiatción válido`)
+      if (
+        room.availability &&
+        parseFloat(
+          roomTypes.find((type) => type.id === room.roomTypeId).capacity
+        ) >= cantidadHuespedes
+      ) {
+        return room.number;
       }
-    } while (!validateNumber(numeroHabitacion) || !(roomNumberAvailable.includes(numeroHabitacion)));
-
+    });
     do {
-      fechaInicio = prompt("Ingresa la fecha en la que nos visitaras (check in): \n\nEscribela porfavor en formato DD/MM/AAAA")
+      numeroHabitacion = parseFloat(
+        prompt(
+          "Las habitaciones disponibles para esa cantidad de personas son:" +
+            rooms
+              .map((room) => {
+                if (
+                  room.availability &&
+                  parseFloat(
+                    roomTypes.find((type) => type.id === room.roomTypeId)
+                      .capacity
+                  ) >= cantidadHuespedes
+                ) {
+                  return `\nRoom Number: ${room.number} (${
+                    roomTypes.find((type) => type.id === room.roomTypeId).name
+                  })`;
+                }
+              })
+              .join(" ") +
+            "\n\nIngrese el numero de habitacion a reservar:"
+        )
+      );
+      if (!roomNumberAvailable.includes(numeroHabitacion)) {
+        alert(
+          `Esa habitación no se encuentra en la lista proporcionada, porfavor ingresa un numero de habiatción válido`
+        );
+      }
+    } while (
+      !validateNumber(numeroHabitacion) ||
+      !roomNumberAvailable.includes(numeroHabitacion)
+    );
+  }
+  function checkin() {
+    do {
+      fechaInicio = prompt(
+        "Ingresa la fecha en la que nos visitaras (check in): \n\nEscribela porfavor en formato DD/MM/AAAA"
+      );
     } while (!validateDate(fechaInicio));
+  }
+  function checkout() {
     let dateFin, dateInicio;
     do {
-      fechaFin = prompt("Ingresa la fecha en la que saldrás (check out): \n\nEscribela porfavor en formato DD/MM/AAAA");
-      const [diaFin, mesFin, añoFin] = fechaFin.split('/');
-      const [diaInicio, mesInicio, añoInicio] = fechaInicio.split('/');
-      
+      fechaFin = prompt(
+        "Ingresa la fecha en la que saldrás (check out): \n\nEscribela porfavor en formato DD/MM/AAAA"
+      );
+      const [diaFin, mesFin, añoFin] = fechaFin.split("/");
+      const [diaInicio, mesInicio, añoInicio] = fechaInicio.split("/");
+
       dateFin = new Date(`${añoFin}-${mesFin}-${diaFin}`);
       dateInicio = new Date(`${añoInicio}-${mesInicio}-${diaInicio}`);
-      if((dateFin <= dateInicio)){
-      alert(`La fecha de check out debe ser posterior a la fecha del check in`);
+      if (dateFin <= dateInicio) {
+        alert(
+          `La fecha de check out debe ser posterior a la fecha del check in`
+        );
       }
-    } while (!validateDate(fechaFin) || (dateFin <= dateInicio));
+    } while (!validateDate(fechaFin) || dateFin <= dateInicio);
     do {
-      huesped = prompt("Ingresa el primer nombre y el primer apellido de quien reserva de la reserva").trim().toLowerCase();
+      huesped = prompt(
+        "Ingresa el primer nombre y el primer apellido de quien reserva de la reserva"
+      )
+        .trim()
+        .toLowerCase();
     } while (!validateGuestName(huesped));
-    return numeroHabitacion, cantidadHuespedes, fechaInicio, fechaFin, huesped, rooms,roomTypes;
-  })
-  .catch((error) => {
-    console.error("Error al manejar la promesa:", error);
-  });
+  }
+  function generarGeneradorId() {
+    let id = 1; // Variable id se inicializa fuera de la función interna
+
+    return function () {
+      return id++; // Cada vez que se llama a la función, se incrementa id y se devuelve
+    };
+  }
+  function confirmationBooking() {
+    let confirmBooking = confirm(
+      `Resumen de reserva:\n\nHuesped: ${huesped}\nCheck in: ${fechaInicio}\nCheck out: ${fechaFin}\nHabitaciòn: ${numeroHabitacion}\nPrecio por noche: ${
+        rooms.find((e) => parseFloat(e.number) == numeroHabitacion).priceNight
+      }\n\n¿Desea confirmar la reserva?`
+    );
+    if (confirmBooking) {
+      const generarId = generarGeneradorId(); // Se obtiene la función interna generarId()
+      const id = generarId();
+      let booking = {
+        id,
+        huesped,
+        numeroHabitacion,
+        fechaInicio,
+        fechaFin,
+      };
+      bookings.push(booking);
+      rooms.forEach((element) => {
+        if (parseFloat(element.number) == numeroHabitacion) {
+          element.availability = false;
+        }
+      });
+      alert(
+        `La reserva de la habitaciòn ${numeroHabitacion} a nombre de ${huesped} para los dìas ${fechaInicio} y ${fechaFin} ha sido confirmada`
+      );
+      return rooms;
+    } else {
+      return rooms;
+    }
+  }
+}
+
+//Funciòn para ver reservas
+function verReservas() {
+  if (bookings.length != 0) {
+    let huesped;
+    do {
+      huesped = prompt(
+        "Ingresa el primer nombre y primer apellido de la persona que hizo la reserva"
+      )
+        .trim()
+        .toLowerCase();
+    } while (!validateGuestName(huesped));
+    if (bookings.some((e) => e.huesped == huesped)) {
+      alert(
+        `Las siguientes reservas fueron encontradas a nombre de ${huesped}:\n` +
+          bookings
+            .filter((e) => e.huesped == huesped)
+            .map(
+              (e) =>
+                `\n- id(${e.id}) Habitaciòn reservada: ${e.numeroHabitacion} para las fechas ${e.fechaInicio} a ${e.fechaFin}`
+            )
+      );
+    } else {
+      alert(`No se encontrò ninguna reserva a nombre de ${huesped}`);
+    }
+  } else {
+    alert(`No existen reservaciones en nuestra base de datos`);
+  }
+}
+
+//Funcion para cancelar reservar
+function cancelarReservas() {
+  if (bookings.length != 0) {
+    let huesped;
+    do {
+      huesped = prompt(
+        "Ingresa el primer nombre y primer apellido de la persona que hizo la reserva"
+      )
+        .trim()
+        .toLowerCase();
+    } while (!validateGuestName(huesped));
+    if (bookings.some((e) => e.huesped == huesped)) {
+      alert(
+        `Las siguientes reservas fueron encontradas a nombre de ${huesped}:\n` +
+          bookings
+            .filter((e) => e.huesped == huesped)
+            .map(
+              (e) =>
+                `\n- id(${e.id}) Habitaciòn reservada: ${e.numeroHabitacion} para las fechas ${e.fechaInicio} a ${e.fechaFin}`
+            )
+      );
+      let userId = parseFloat(
+        prompt("Ingresa el id de la reservaciòn que deseas cancelar").trim()
+      );
+      if (bookings.some((e) => e.id == userId)) {
+        huesped = prompt(
+          "Para confirmar ingresa nuevamente el primer nombre y el primer apellido de la persona que hizo la reservaciòn"
+        ).trim();
+        if (bookings.some((e) => e.id == userId && e.huesped == huesped)) {
+          bookings = bookings.filter((e) => e.id != userId);
+          alert(
+            `La reserva a nombre de ${huesped} con id: ${userId} ha sido eliminada con èxito`
+          );
+        } else {
+          alert(
+            `Lo sentimos el nombre ingresado no corresponde con la persona que realizo la reservaciòn`
+          );
+        }
+      } else {
+        alert(
+          `El Id ingresado no ha sido asignado a ninguna reserva, vuelve a intentarlo. \n\nTe redigiremos al menu`
+        );
+      }
+    } else {
+      alert(`No se encontrò ninguna reserva a nombre de ${huesped}`);
+    }
+  } else {
+    alert(`No existen reservas agregadas en nuestra base de datos`);
+  }
+}
+
+//Funciòn asìncrona para cargar datos y navegar el menu
+function menu() {
+  cargarYMostrarData()
+    .then(({ rooms, roomTypes }) => {
+      a = rooms;
+      b = roomTypes;
+      return { a, b };
+    })
+    .then(({ a, b }) => {
+      let flag = true;
+      while (flag) {
+        const desicion = prompt(
+          `Bienvenido a tu asistente de reservas de hotel\n\nElije una de las siguientes opciones:\n\n1. Reservar una habitaciòn\n2. Ver reservas actuales\n3. Cancelar una reserva \n4. Editar una reserva\n5. Salir\n\nEscribe 1, 2, 3, 4 o 5`
+        );
+        let rooms = a,
+          roomTypes = b;
+        switch (desicion) {
+          case "1":
+            crearReserva(rooms, roomTypes);
+            break;
+          case "2":
+            verReservas();
+            break;
+          case "3":
+            cancelarReservas();
+            break;
+          case "5":
+            flag = false;
+            break;
+          default:
+            alert(`Opciòn invàlida, porfavor ingresa una opciòn vàlida`);
+            break;
+        }
+      }
+    })
+    .catch((error) => {
+      console.error("Error al manejar la promesa:", error);
+    });
+}
+menu();
