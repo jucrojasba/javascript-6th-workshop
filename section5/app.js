@@ -353,7 +353,7 @@ function editBooking() {
           checkin();
           checkout();
           bookings.forEach((element) => {
-            if (parseFloat(element.numberoHabitación) == numeroHabitacion) {
+            if (parseFloat(element.numeroHabitacion) == numeroHabitacion) {
               element.fechaInicio=fechaInicio;
               element.fechaFin = fechaFin;
             }});
